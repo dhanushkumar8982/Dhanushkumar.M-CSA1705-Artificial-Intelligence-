@@ -1,0 +1,77 @@
+import heapq
+
+def a_star(graph, heuristic, start, goal):
+
+    # Priority queue: (f_cost, g_cost, current_node, path)
+    open_list = []
+
+    heapq.heappush(open_list, (0, 0, start, [start]))
+
+    visited = set()
+
+    while open_list:
+
+        f_cost, g_cost, current, path = heapq.heappop(open_list)
+
+        if current in visited:
+            continue
+
+        visited.add(current)
+
+        # Goal reached
+        if current == goal:
+            return path, g_cost
+
+        # Explore neighboring nodes
+        for neighbor, cost in graph[current]:
+
+            if neighbor not in visited:
+
+                new_g_cost = g_cost + cost
+                h_cost = heuristic[neighbor]
+                new_f_cost = new_g_cost + h_cost
+
+                heapq.heappush(
+                    open_list,
+                    (
+                        new_f_cost,
+                        new_g_cost,
+                        neighbor,
+                        path + [neighbor]
+                    )
+                )
+
+    return None, None
+
+
+# Graph representation
+graph = {
+    'A': [('B', 1), ('C', 4)],
+    'B': [('A', 1), ('C', 2), ('D', 5)],
+    'C': [('A', 4), ('B', 2), ('D', 1)],
+    'D': [('B', 5), ('C', 1), ('E', 3)],
+    'E': [('D', 3)]
+}
+
+# Heuristic values to the goal node E
+heuristic = {
+    'A': 7,
+    'B': 6,
+    'C': 4,
+    'D': 3,
+    'E': 0
+}
+
+
+# Get start and goal nodes
+start = input("Enter starting node: ").upper()
+goal = input("Enter goal node: ").upper()
+
+path, cost = a_star(graph, heuristic, start, goal)
+
+if path:
+    print("\nShortest Path:")
+    print(" -> ".join(path))
+    print("Total Cost:", cost)
+else:
+    print("\nNo path found.")
